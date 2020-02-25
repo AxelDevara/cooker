@@ -1,0 +1,71 @@
+syntax = "proto3";
+package proto;
+
+import "google/protobuf/timestamp.proto";
+
+message Post {
+	int64 id = 1;
+	string title = 2;
+	bytes image = 3;
+	int64 price = 4;
+	string description = 5;
+	string username = 6;
+	string location = 7;
+    
+	google.protobuf.Timestamp created_at = 8;
+	google.protobuf.Timestamp deadline = 9;
+}
+
+message CreatePostReq{
+	Post post = 1;
+	string api = 2;
+}
+
+message CreatePostResponse{
+	int64 id =1;
+	string api = 2;
+
+}
+
+message ReadPostReq{
+	int64 id=1;
+}
+message ReadPostResponse{
+	Post post =1;
+}
+
+message UpdatePostReq{
+	Post post =1;
+	string api = 2;
+
+}
+message UpdatePostResponse{
+	int64 updated =1;
+	string api = 2;
+
+}
+message ReadAllRequest{
+	string api = 1;
+}
+message ReadAllResponse{
+	repeated Post posts = 1;
+	string api =2;
+}
+
+message DeletePostReq{
+	int64 id = 1;
+	string api = 2;
+}
+message DeletePostResponse{
+	int64 deleted = 1;
+	string api =2;
+}
+service AddService{
+	rpc CreatePost(CreatePostReq) returns (CreatePostResponse);
+	rpc UpdatePost(UpdatePostReq) returns (UpdatePostResponse);
+	rpc ReadPost(ReadPostReq) returns (ReadPostResponse);
+	rpc DeletePost(DeletePostReq) returns (DeletePostResponse);
+	rpc ReadAll(ReadAllRequest) returns (ReadAllResponse);
+
+}
+
