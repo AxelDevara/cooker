@@ -1,5 +1,6 @@
+import 'package:cooker/classes/user.dart';
 import 'package:cooker/pages/homepage.dart';
-import 'package:cooker/widgets/login.dart';
+import 'package:cooker/pages/login.dart';
 import 'package:flutter/material.dart';
 
 import 'baseAuth.dart';
@@ -20,8 +21,11 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  final key = new GlobalKey<LoginSignupPageState>();
+
   AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
   String _userId = "";
+  User _currentUser;
 
   @override
   void initState() {
@@ -29,10 +33,10 @@ class _RootPageState extends State<RootPage> {
     widget.auth.getCurrentUser().then((user) {
       setState(() {
         if (user != null) {
-          _userId = user?.uid;
+          _userId = user?.id;
         }
         authStatus =
-            user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+            user?.id == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
       });
     });
   }
@@ -40,7 +44,7 @@ class _RootPageState extends State<RootPage> {
   void loginCallback() {
     widget.auth.getCurrentUser().then((user) {
       setState(() {
-        _userId = user.uid.toString();
+        _userId = user.id.toString();
       });
     });
     setState(() {
@@ -81,7 +85,7 @@ class _RootPageState extends State<RootPage> {
           return new DefaultTabController(
               length: 3,
               child: HomePage(
-                userId: _userId,
+                userId: _currentUser.id,
                 auth: widget.auth,
                 logoutCallback: logoutCallback,
               ));

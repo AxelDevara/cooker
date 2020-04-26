@@ -1,3 +1,5 @@
+import 'package:cooker/classes/user.dart';
+import 'package:uuid/uuid.dart';
 import 'package:cooker/auth/baseAuth.dart';
 import 'package:flutter/material.dart';
 
@@ -8,12 +10,19 @@ class LoginSignupPage extends StatefulWidget {
   final VoidCallback loginCallback;
 
   @override
-  State<StatefulWidget> createState() => new _LoginSignupPageState();
+  State<StatefulWidget> createState() => new LoginSignupPageState();
 }
 
-class _LoginSignupPageState extends State<LoginSignupPage> {
+class LoginSignupPageState extends State<LoginSignupPage> {
   final _formKey = new GlobalKey<FormState>();
 
+  String userKey;
+
+  String _firstname;
+  String _lastname;
+  String _username;
+  String _phone;
+  String _address;
   String _email;
   String _password;
   String _errorMessage;
@@ -37,22 +46,24 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
       _isLoading = true;
     });
     if (validateAndSave()) {
-      String userId = "";
+      User currentUser;
+      String authkey;
       try {
         if (_isLoginForm) {
-          userId = await widget.auth.signIn(_email, _password);
-          print('Signed in: $userId');
+          authkey = await widget.auth.signIn(_email, _password);
+          currentUser = await widget.auth.logInDatabase(_email, _password);
+          print('Signed in: $currentUser');
         } else {
-          userId = await widget.auth.signUp(_email, _password);
-          //widget.auth.sendEmailVerification();
-          //_showVerifyEmailSentDialog();
-          print('Signed up user: $userId');
+          authkey = await widget.auth.signUp(_email, _password);
+          currentUser = await widget.auth.registerToDatabase(_firstname,
+              _lastname, _username, _password, _address, _phone, _email);
+          print('Signed up user: $currentUser');
         }
         setState(() {
           _isLoading = false;
         });
 
-        if (userId.length > 0 && userId != null && _isLoginForm) {
+        if (authkey.length > 0 && authkey != null && _isLoginForm) {
           widget.loginCallback();
         }
       } catch (e) {
@@ -177,7 +188,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
         child: CircleAvatar(
           backgroundColor: Colors.transparent,
           radius: 48.0,
-          child: Image.asset('assets/flutter-icon.png'),
+          child: Image.asset('assets/images/logo.png'),
         ),
       ),
     );
@@ -186,18 +197,93 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
   Widget showEmailInput() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
-      child: new TextFormField(
-        maxLines: 1,
-        keyboardType: TextInputType.emailAddress,
-        autofocus: false,
-        decoration: new InputDecoration(
-            hintText: 'Email',
-            icon: new Icon(
-              Icons.mail,
-              color: Colors.grey,
-            )),
-        validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
-        onSaved: (value) => _email = value.trim(),
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            maxLines: 1,
+            keyboardType: TextInputType.text,
+            autofocus: false,
+            decoration: new InputDecoration(
+                hintText: 'First name',
+                icon: new Icon(
+                  Icons.mail,
+                  color: Colors.grey,
+                )),
+            validator: (value) =>
+                value.isEmpty ? 'first name can\'t be empty' : null,
+            onSaved: (value) => _firstname = value.trim(),
+          ),
+          TextFormField(
+            maxLines: 1,
+            keyboardType: TextInputType.text,
+            autofocus: false,
+            decoration: new InputDecoration(
+                hintText: 'last name',
+                icon: new Icon(
+                  Icons.mail,
+                  color: Colors.grey,
+                )),
+            validator: (value) =>
+                value.isEmpty ? 'last name can\'t be empty' : null,
+            onSaved: (value) => _lastname = value.trim(),
+          ),
+          TextFormField(
+            maxLines: 1,
+            keyboardType: TextInputType.emailAddress,
+            autofocus: false,
+            decoration: new InputDecoration(
+                hintText: 'Email',
+                icon: new Icon(
+                  Icons.mail,
+                  color: Colors.grey,
+                )),
+            validator: (value) =>
+                value.isEmpty ? 'Email can\'t be empty' : null,
+            onSaved: (value) => _email = value.trim(),
+          ),
+          TextFormField(
+            maxLines: 1,
+            keyboardType: TextInputType.text,
+            autofocus: false,
+            decoration: new InputDecoration(
+                hintText: 'username',
+                icon: new Icon(
+                  Icons.mail,
+                  color: Colors.grey,
+                )),
+            validator: (value) =>
+                value.isEmpty ? 'Username can\'t be empty' : null,
+            onSaved: (value) => _username = value.trim(),
+          ),
+          TextFormField(
+            maxLines: 1,
+            keyboardType: TextInputType.phone,
+            autofocus: false,
+            decoration: new InputDecoration(
+                hintText: 'phone number',
+                icon: new Icon(
+                  Icons.mail,
+                  color: Colors.grey,
+                )),
+            validator: (value) =>
+                value.isEmpty ? 'phone can\'t be empty' : null,
+            onSaved: (value) => _phone = value.trim(),
+          ),
+          TextFormField(
+            maxLines: 1,
+            keyboardType: TextInputType.text,
+            autofocus: false,
+            decoration: new InputDecoration(
+                hintText: 'Address',
+                icon: new Icon(
+                  Icons.mail,
+                  color: Colors.grey,
+                )),
+            validator: (value) =>
+                value.isEmpty ? 'address can\'t be empty' : null,
+            onSaved: (value) => _address = value.trim(),
+          ),
+        ],
       ),
     );
   }

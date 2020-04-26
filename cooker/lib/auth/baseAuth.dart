@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:cooker/classes/user.dart';
+import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class BaseAuth {
@@ -6,9 +9,22 @@ abstract class BaseAuth {
 
   Future<String> signUp(String email, String password);
 
-  Future<FirebaseUser> getCurrentUser();
+  Future<User> getCurrentUser();
 
   Future<void> sendEmailVerification();
+  Future<User> logInDatabase(String email, String password);
+
+  Future<User> registerToDatabase(
+    String firstname,
+    String lastname,
+    String username,
+    String password,
+    String address,
+    String phone,
+    String email,
+  );
+
+  Future<String> getUid();
 
   Future<void> signOut();
 
@@ -17,6 +33,65 @@ abstract class BaseAuth {
 
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+ User currentUser;
+
+  Future<User> registerToDatabase(
+    String firstname,
+    String lastname,
+    String username,
+    String password,
+    String address,
+    String phone,
+    String email,
+  ) async {
+    final http.Response response = await http.post(
+      'https://localhost:3030/register',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'firstname': firstname,
+        'lastname': lastname,
+        'username': username,
+        'password': password,
+        'address': address,
+        'phone': phone
+      }),
+    );
+    if (response.statusCode == 201) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      currentUser = User.fromJson(json.decode(response.body));
+      return currentUser;
+    } else {
+      // If the server did not return a 201 CREATED response,
+      // then throw an exception.
+      throw Exception(response.body);
+    }
+  }
+
+  Future<User> logInDatabase(String email, String password) async {
+    final http.Response response = await http.post(
+      'https://localhost:3030/login',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'password': password,
+      }),
+    );
+    if (response.statusCode == 201) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      currentUser = User.fromJson(json.decode(response.body));
+      return currentUser;
+    } else {
+      // If the server did not return a 201 CREATED response,
+      // then throw an exception.
+      throw Exception(response.body);
+    }
+  }
 
   Future<String> signIn(String email, String password) async {
     AuthResult result = await _firebaseAuth.signInWithEmailAndPassword(
@@ -32,9 +107,14 @@ class Auth implements BaseAuth {
     return user.uid;
   }
 
-  Future<FirebaseUser> getCurrentUser() async {
+  Future<User> getCurrentUser() async {
+     return currentUser;
+  }
+
+  Future<String> getUid() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
-    return user;
+    String uid = user.uid;
+    return uid;
   }
 
   Future<void> signOut() async {

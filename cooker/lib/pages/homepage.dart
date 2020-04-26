@@ -1,7 +1,7 @@
 import 'package:cooker/auth/baseAuth.dart';
 import 'package:cooker/widgets/posts.dart';
 import 'package:flutter/material.dart';
-import 'package:cooker/searchbar/searchbar.dart';
+import 'package:cooker/header/searchbar.dart';
 
 // class HomePage extends StatelessWidget {
 //   // This widget is the root of your application.
@@ -26,7 +26,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,11 +43,16 @@ class _HomePageState extends State<HomePage> {
             SliverOverlapAbsorber(
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               child: SliverAppBar(
+                shape: ContinuousRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30))),
                 snap: true,
                 flexibleSpace: FlexibleSpaceBar(
-                    centerTitle: true,
-                    title: Text('Cooker'),
-                    background: SearchBar()),
+                  centerTitle: true,
+                  title: Text(widget.userId),
+                  background: SearchBar(),
+                ),
                 expandedHeight: 200,
                 floating: true,
                 forceElevated: innerBoxIsScrolled,
