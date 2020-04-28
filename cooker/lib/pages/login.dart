@@ -100,15 +100,12 @@ class LoginSignupPageState extends State<LoginSignupPage> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text('MAMA'),
-        ),
         body: Stack(
-          children: <Widget>[
-            _showForm(),
-            _showCircularProgress(),
-          ],
-        ));
+      children: <Widget>[
+        _showForm(),
+        _showCircularProgress(),
+      ],
+    ));
   }
 
   Widget _showCircularProgress() {
@@ -153,6 +150,7 @@ class LoginSignupPageState extends State<LoginSignupPage> {
             shrinkWrap: true,
             children: <Widget>[
               showLogo(),
+              if (!_isLoginForm) showRegistrationForm(),
               showEmailInput(),
               showPasswordInput(),
               showPrimaryButton(),
@@ -194,7 +192,7 @@ class LoginSignupPageState extends State<LoginSignupPage> {
     );
   }
 
-  Widget showEmailInput() {
+  Widget showRegistrationForm() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
       child: Column(
@@ -226,20 +224,6 @@ class LoginSignupPageState extends State<LoginSignupPage> {
             validator: (value) =>
                 value.isEmpty ? 'last name can\'t be empty' : null,
             onSaved: (value) => _lastname = value.trim(),
-          ),
-          TextFormField(
-            maxLines: 1,
-            keyboardType: TextInputType.emailAddress,
-            autofocus: false,
-            decoration: new InputDecoration(
-                hintText: 'Email',
-                icon: new Icon(
-                  Icons.mail,
-                  color: Colors.grey,
-                )),
-            validator: (value) =>
-                value.isEmpty ? 'Email can\'t be empty' : null,
-            onSaved: (value) => _email = value.trim(),
           ),
           TextFormField(
             maxLines: 1,
@@ -284,6 +268,25 @@ class LoginSignupPageState extends State<LoginSignupPage> {
             onSaved: (value) => _address = value.trim(),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget showEmailInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
+      child: TextFormField(
+        maxLines: 1,
+        keyboardType: TextInputType.emailAddress,
+        autofocus: false,
+        decoration: new InputDecoration(
+            hintText: 'Email',
+            icon: new Icon(
+              Icons.mail,
+              color: Colors.grey,
+            )),
+        validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
+        onSaved: (value) => _email = value.trim(),
       ),
     );
   }

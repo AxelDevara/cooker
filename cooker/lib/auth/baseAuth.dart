@@ -45,8 +45,9 @@ class Auth implements BaseAuth {
     String email,
   ) async {
     final http.Response response = await http.post(
-      'https://localhost:3030/register',
+      'http://localhost:3030/register',
       headers: <String, String>{
+        'Accept': 'application/json',
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
@@ -55,11 +56,12 @@ class Auth implements BaseAuth {
         'username': username,
         'password': password,
         'address': address,
-        'phone': phone
+        'phone': phone,
+        'email': email
       }),
     );
-    if (response.statusCode == 201) {
-      // If the server did return a 201 CREATED response,
+    if (response.statusCode == 200) {
+      // If the server did return a 200 CREATED response,
       // then parse the JSON.
       currentUser = User.fromJson(json.decode(response.body));
       return currentUser;
@@ -72,17 +74,23 @@ class Auth implements BaseAuth {
 
   Future<User> logInDatabase(String email, String password) async {
     final http.Response response = await http.post(
-      'https://localhost:3030/login',
+      'http://localhost:3030/login',
       headers: <String, String>{
+        'Accept': 'application/json',
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'email': email,
+        'firstname': 'login',
+        'lastname': 'from',
+        'username': 'app',
         'password': password,
+        'address': 'this',
+        'phone': 'no phone',
+        'email': email
       }),
     );
-    if (response.statusCode == 201) {
-      // If the server did return a 201 CREATED response,
+    if (response.statusCode == 200) {
+      // If the server did return a 200 CREATED response,
       // then parse the JSON.
       currentUser = User.fromJson(json.decode(response.body));
       return currentUser;
